@@ -17,13 +17,13 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Offline commands skip config loading.
 		switch cmd.Name() {
-		case "schema", "install-skills", "config", "help", "init":
+		case "schema", "skills", "config", "help", "init":
 			return nil
 		}
-		// Walk up to find an offline-group ancestor (e.g. `config init`).
+		// Walk up to find an offline-group ancestor (e.g. `config init`, `skills list`).
 		for p := cmd.Parent(); p != nil; p = p.Parent() {
 			switch p.Name() {
-			case "schema", "install-skills", "config":
+			case "schema", "skills", "config":
 				return nil
 			}
 		}

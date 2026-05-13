@@ -39,13 +39,15 @@ ynab transactions create --dry-run --json '{
 
 Amounts are **milliunits** — `$10.00 = 10000`, `-$42.50 = -42500`.
 
-## Install AI agent skills
+## AI agent skills
 
 ```bash
-ynab install-skills
+ynab skills list                # enumerate bundled skills
+ynab skills get <name>          # print one skill (raw markdown; --format json for full envelope)
+ynab skills install             # copy skills to ~/.claude/skills or ./.claude/skills
 ```
 
-Installs structured SKILL.md files so Claude Code (or any agent) knows how to drive the CLI safely.
+`skills list` and `skills get` let an agent read skill content at runtime — no on-disk install required. `skills install` copies structured SKILL.md files locally so Claude Code (or any agent) picks them up automatically.
 
 ## Docs
 

@@ -25,7 +25,7 @@ go vet ./...
 - `internal/validate/` — Input sanitization (path params, dates, JSON bodies)
 - `internal/format/` — Output formatting (JSON, NDJSON, field filtering)
 - `internal/cmd/ynab-api.json` — Embedded OpenAPI spec for the `schema` command
-- `internal/cmd/skills/` — Embedded SKILL.md files installed by `ynab install-skills`
+- `internal/cmd/skills/` — Embedded SKILL.md files; surface via `ynab skills list` / `ynab skills get <name>` (runtime) or `ynab skills install` (on disk)
 
 ## Adding a New API Operation
 
