@@ -1,0 +1,20 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  # Default set: errcheck, govet, ineffassign, staticcheck, unused.
+  exclusions:
+    rules:
+      # Closing a response body after it has been read, and writing to
+      # stdout/stderr or a tabwriter, return errors we intentionally ignore
+      # throughout the CLI. Keep errcheck active for everything else.
+      - linters: [errcheck]
+        source: '\.Close\(\)$'
+      - linters: [errcheck]
+        source: 'fmt\.(Fprint|Fprintf|Fprintln|Scan|Scanln)'
+      # Flag-set mutation in test setup.
+      - linters: [errcheck]
+        path: _test\.go
+        source: '\.Set\('

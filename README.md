@@ -1,5 +1,7 @@
 # ynab-cli
 
+[![CI](https://github.com/glebmish/ynab-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/glebmish/ynab-cli/actions/workflows/ci.yml)
+
 A command-line interface for the [YNAB (You Need A Budget) API](https://api.ynab.com/). 100% API coverage across 44 operations. Designed for AI agents and human operators.
 
 > **Unofficial.** This is a third-party tool and is not affiliated with, associated with, or endorsed by YNAB.
