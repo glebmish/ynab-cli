@@ -1,6 +1,8 @@
 # ynab-cli
 
 [![CI](https://github.com/glebmish/ynab-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/glebmish/ynab-cli/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/glebmish/ynab-cli)](https://github.com/glebmish/ynab-cli/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/glebmish/ynab-cli)](./LICENSE)
 
 A command-line interface for the [YNAB (You Need A Budget) API](https://api.ynab.com/). 100% API coverage across 44 operations. Designed for AI agents and human operators.
 
@@ -56,6 +58,12 @@ ynab transactions create --dry-run --json '{
 }'
 ```
 
+`--dry-run` prints the exact request instead of sending it:
+
+```
+POST https://api.ynab.com/v1/plans/last-used/transactions body: {"transaction":{"account_id":"abc-123","date":"2026-04-18","amount":-42500,"payee_name":"Corner Store","memo":"Groceries"}}
+```
+
 Amounts are **milliunits** — `$10.00 = 10000`, `-$42.50 = -42500`.
 
 ## AI agent skills
@@ -70,10 +78,15 @@ ynab skills install             # copy skills to ~/.claude/skills or ./.claude/s
 
 ## Docs
 
-- [CONTEXT.md](./CONTEXT.md) — agent-facing cheat sheet
 - [CLAUDE.md](./CLAUDE.md) — repo architecture / contribution notes
+- [Releases](https://github.com/glebmish/ynab-cli/releases) — changelog and downloads
 - `ynab schema --list` — all 44 operations
 - `ynab <resource> <action> --help` — per-command flags
+- `ynab skills get <name>` — agent-facing usage recipes, served at runtime
+
+## License
+
+[MIT](./LICENSE) © Gleb Mishchenko
 
 ## Disclaimer
 
