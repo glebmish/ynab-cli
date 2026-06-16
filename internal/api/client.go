@@ -33,12 +33,20 @@ func (e *APIError) Error() string {
 	switch e.StatusCode {
 	case 401:
 		msg += " (hint: check your access token; YNAB tokens are created at https://app.ynab.com/settings/developer)"
+	case 403:
+		msg += " (hint: check the scopes/permissions on this token; a read-only token cannot mutate data)"
 	case 404:
 		msg += " (hint: resource not found - verify plan_id/account_id/etc. Use 'ynab plans list' to see valid IDs)"
 	case 409:
 		msg += " (hint: conflict - resource may already exist or was modified concurrently)"
+	case 422:
+		msg += " (hint: validation failed server-side; run with --dry-run to inspect the body and check 'ynab schema <op>')"
 	case 429:
 		msg += " (hint: rate limited - YNAB allows 200 requests/hour per token)"
+	case 500:
+		msg += " (hint: usually a malformed request body; run with --dry-run to inspect what is sent)"
+	case 503:
+		msg += " (hint: transient YNAB outage; retry with backoff)"
 	}
 	return msg
 }

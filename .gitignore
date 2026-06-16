@@ -1,3 +1,25 @@
+# Binary
 /ynab
+/ynab-cli
+
+# Build output (GoReleaser)
+/dist/
+
+# Test / coverage / profiling
 *.test
-coverage.out
+*.out
+
+# Logs
+*.log
+
+# Env files (project uses env vars / external config; guard against accidents)
+.env
+.env.*
+
+# Editor / OS junk
+.DS_Store
+.idea/
+.vscode/
+
+# Local Claude Code config
+.claude/

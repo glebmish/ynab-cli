@@ -2,6 +2,8 @@
 
 A command-line interface for the [YNAB (You Need A Budget) API](https://api.ynab.com/). 100% API coverage across 44 operations. Designed for AI agents and human operators.
 
+> **Unofficial.** This is a third-party tool and is not affiliated with, associated with, or endorsed by YNAB.
+
 ## Install
 
 ```bash
@@ -55,3 +57,7 @@ ynab skills install             # copy skills to ~/.claude/skills or ./.claude/s
 - [CLAUDE.md](./CLAUDE.md) — repo architecture / contribution notes
 - `ynab schema --list` — all 44 operations
 - `ynab <resource> <action> --help` — per-command flags
+
+## Disclaimer
+
+We are not affiliated, associated, or in any way officially connected with YNAB or any of its subsidiaries or affiliates. The official YNAB website can be found at https://www.ynab.com. The names YNAB and You Need A Budget, as well as related names, marks, emblems and images, are registered trademarks of their respective owners.
