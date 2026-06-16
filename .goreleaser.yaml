@@ -15,7 +15,10 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X main.version={{ .Version }}
+      - -s -w
+      - -X github.com/glebmish/ynab-cli/internal/cmd.version={{ .Version }}
+      - -X github.com/glebmish/ynab-cli/internal/cmd.commit={{ .Commit }}
+      - -X github.com/glebmish/ynab-cli/internal/cmd.date={{ .Date }}
     goos:
       - linux
       - darwin
@@ -41,12 +44,38 @@ snapshot:
 
 changelog:
   sort: asc
+  use: github
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Other changes
+      order: 999
   filters:
     exclude:
       - "^docs:"
       - "^test:"
       - "^chore:"
       - "^ci:"
+
+release:
+  header: |
+    `ynab` is a command-line interface for the [YNAB (You Need A Budget) API](https://api.ynab.com/) — 100% coverage across 44 operations, built for AI agents and humans.
+  footer: |
+    ## Install
+
+    ```bash
+    brew install glebmish/tap/ynab
+    # or
+    go install github.com/glebmish/ynab-cli/cmd/ynab@{{ .Tag }}
+    ```
+
+    Prebuilt binaries for macOS, Linux, and Windows are attached below. See the [README](https://github.com/glebmish/ynab-cli#readme) for usage.
+
+    > Unofficial — not affiliated with YNAB.
 
 homebrew_casks:
   - name: ynab

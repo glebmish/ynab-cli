@@ -3,16 +3,55 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/glebmish/ynab-cli/internal/api"
 	"github.com/glebmish/ynab-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 
+// Build metadata, overridden at release time via -ldflags. Defaults describe a
+// non-release (source / `go install`) build. GoReleaser injects real values via
+// -X github.com/glebmish/ynab-cli/internal/cmd.{version,commit,date}.
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
+// versionString renders the --version output. When -ldflags weren't applied
+// (a plain `go install ...@vX.Y.Z` build, where version is still "dev"), it
+// falls back to the module version and VCS metadata Go embeds in the binary,
+// so `go install ...@v0.1.0` reports v0.1.0 instead of "dev".
+func versionString() string {
+	v, c, d := version, commit, date
+	if v == "dev" {
+		if info, ok := debug.ReadBuildInfo(); ok {
+			if info.Main.Version != "" && info.Main.Version != "(devel)" {
+				v = info.Main.Version
+			}
+			for _, s := range info.Settings {
+				switch s.Key {
+				case "vcs.revision":
+					if s.Value != "" {
+						c = s.Value
+					}
+				case "vcs.time":
+					if s.Value != "" {
+						d = s.Value
+					}
+				}
+			}
+		}
+	}
+	return fmt.Sprintf("%s (commit %s, built %s)", v, c, d)
+}
+
 var rootCmd = &cobra.Command{
 	Use:          "ynab",
 	Short:        "CLI for the YNAB (You Need A Budget) API",
 	Long:         "ynab is a command-line interface for the YNAB API.\nDesigned for AI agents and human operators. 100% API coverage.",
+	Version:      versionString(),
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Offline commands skip config loading.
@@ -60,15 +99,6 @@ var rootCmd = &cobra.Command{
 
 func Execute() error {
 	return rootCmd.Execute()
-}
-
-// SetVersion wires the build-time version into the root command, enabling
-// `ynab --version`. A no-op for empty input so a plain build keeps cobra's
-// default (no version flag).
-func SetVersion(v string) {
-	if v != "" {
-		rootCmd.Version = v
-	}
 }
 
 func init() {

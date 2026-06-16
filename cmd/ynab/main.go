@@ -9,14 +9,9 @@ import (
 	"github.com/glebmish/ynab-cli/internal/cmd"
 )
 
-// version is set at build time via -ldflags "-X main.version=...".
-// GoReleaser injects the git tag; a plain `go build` leaves it as "dev".
-var version = "dev"
-
 // main does not print the error — cobra already does (SilenceUsage:true,
 // SilenceErrors:false). Printing here on top would double every error.
 func main() {
-	cmd.SetVersion(version)
 	if err := cmd.Execute(); err != nil {
 		os.Exit(exitCode(err))
 	}
