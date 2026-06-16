@@ -62,6 +62,15 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
+// SetVersion wires the build-time version into the root command, enabling
+// `ynab --version`. A no-op for empty input so a plain build keeps cobra's
+// default (no version flag).
+func SetVersion(v string) {
+	if v != "" {
+		rootCmd.Version = v
+	}
+}
+
 func init() {
 	rootCmd.PersistentFlags().String("format", "json", "Output format: json, ndjson, text")
 	rootCmd.PersistentFlags().String("fields", "", "Comma-separated fields to include in output (dotted paths supported, e.g. 'categories.name')")

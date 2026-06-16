@@ -7,18 +7,20 @@ Go CLI (`ynab`) for the YNAB (You Need A Budget) API. 44 operations across 10 re
 ## Build & Test
 
 ```bash
-go build -o ynab .
+go build -o ynab ./cmd/ynab
 go test ./...
 go vet ./...
 ```
 
-**Always install after building:** `go install . && cp ~/go/bin/ynab-cli ~/go/bin/ynab`
+**Always install after building:** `go install ./cmd/ynab`
 
-`go install .` names the binary after the module dir (`ynab-cli`), so copy to `ynab` to match the CLI name. Do this every time you make changes so the `ynab` binary on PATH stays current.
+The entrypoint lives in `cmd/ynab/`, so `go install ./cmd/ynab` produces a binary
+named `ynab` directly (no rename needed). Do this every time you make changes so
+the `ynab` binary on PATH stays current.
 
 ## Architecture
 
-- `main.go` — entry point, calls `cmd.Execute()`
+- `cmd/ynab/main.go` — entry point, sets the build-time version and calls `cmd.Execute()`
 - `internal/cmd/` — Cobra commands. `root.go` wires config/client. `helpers.go` defines shared helpers (`doGet`, `doMutate`, `doDelete`). Each resource group is one file (`user.go`, `plans.go`, `accounts.go`, `categories.go`, `payees.go`, `payee_locations.go`, `months.go`, `money_movements.go`, `transactions.go`, `scheduled_transactions.go`).
 - `internal/config/` — YAML config loading, env/flag override, validation (`YNAB_ACCESS_TOKEN`, `YNAB_PLAN_ID`, `YNAB_BASE_URL`, `YNAB_CONFIG`)
 - `internal/api/` — HTTP client with Bearer auth, path substitution, error handling, envelope unwrap (`{"data": ...}`)

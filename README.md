@@ -8,9 +8,24 @@ A command-line interface for the [YNAB (You Need A Budget) API](https://api.ynab
 
 ## Install
 
+**Homebrew** (macOS / Linux):
+
 ```bash
-go install github.com/glebmish/ynab-cli@latest
+brew install glebmish/tap/ynab
 ```
+
+**Go** (requires Go 1.22+):
+
+```bash
+go install github.com/glebmish/ynab-cli/cmd/ynab@latest
+```
+
+**Prebuilt binaries:** download the archive for your platform from the
+[latest release](https://github.com/glebmish/ynab-cli/releases/latest), extract
+it, and put the `ynab` binary on your `PATH`.
+
+Every path installs a single binary named `ynab`. Verify the install with
+`ynab --version`.
 
 ## Configure
 
