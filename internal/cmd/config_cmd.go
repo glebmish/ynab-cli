@@ -20,7 +20,10 @@ var configInitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize configuration file",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cfgPath := configFilePath()
+		cfgPath, err := configFilePath()
+		if err != nil {
+			return err
+		}
 
 		// Preserve existing values if the file is already there.
 		existing, _ := config.Load(cfgPath)
@@ -76,7 +79,11 @@ var configPathCmd = &cobra.Command{
 	Use:   "path",
 	Short: "Print the effective config file path",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println(configFilePath())
+		path, err := configFilePath()
+		if err != nil {
+			return err
+		}
+		fmt.Println(path)
 		return nil
 	},
 }
@@ -85,7 +92,10 @@ var configShowCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Print the resolved config (token masked unless --unmasked)",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		path := configFilePath()
+		path, err := configFilePath()
+		if err != nil {
+			return err
+		}
 		cfg, err := config.Load(path)
 		if err != nil {
 			return err
@@ -104,9 +114,9 @@ var configShowCmd = &cobra.Command{
 	},
 }
 
-func configFilePath() string {
+func configFilePath() (string, error) {
 	if v := os.Getenv("YNAB_CONFIG"); v != "" {
-		return v
+		return v, nil
 	}
 	return config.DefaultPath()
 }

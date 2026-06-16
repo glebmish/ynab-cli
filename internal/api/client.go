@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/glebmish/ynab-cli/internal/validate"
 )
 
 type contextKey struct{}
@@ -80,30 +82,50 @@ func (c *Client) Do(method, pathTemplate string, params map[string]string, body 
 	return c.DoWithContext(context.Background(), method, pathTemplate, params, body)
 }
 
-func (c *Client) DoWithContext(ctx context.Context, method, pathTemplate string, params map[string]string, body []byte) (*http.Response, error) {
-	remaining := make(map[string]string)
+// buildURL substitutes path placeholders and appends leftover params as query
+// string. Every value that lands in a path segment is validated with
+// validate.PathParam and url.PathEscape'd, so neither config-supplied IDs
+// (plan_id) nor --params overlay values can inject into the request path.
+func (c *Client) buildURL(pathTemplate string, params map[string]string) (path string, rawURL string, err error) {
+	remaining := make(map[string]string, len(params))
 	for k, v := range params {
 		remaining[k] = v
 	}
 
-	path := pathTemplate
-	path = strings.ReplaceAll(path, "{plan_id}", c.planID)
+	path = pathTemplate
+	if strings.Contains(path, "{plan_id}") {
+		if err := validate.PathParam("plan_id", c.planID); err != nil {
+			return "", "", err
+		}
+		path = strings.ReplaceAll(path, "{plan_id}", url.PathEscape(c.planID))
+	}
 
 	for k, v := range remaining {
 		placeholder := "{" + k + "}"
 		if strings.Contains(path, placeholder) {
-			path = strings.ReplaceAll(path, placeholder, v)
+			if err := validate.PathParam(k, v); err != nil {
+				return "", "", err
+			}
+			path = strings.ReplaceAll(path, placeholder, url.PathEscape(v))
 			delete(remaining, k)
 		}
 	}
 
-	rawURL := c.baseURL + path
+	rawURL = c.baseURL + path
 	if len(remaining) > 0 {
 		q := url.Values{}
 		for k, v := range remaining {
 			q.Set(k, v)
 		}
 		rawURL += "?" + q.Encode()
+	}
+	return path, rawURL, nil
+}
+
+func (c *Client) DoWithContext(ctx context.Context, method, pathTemplate string, params map[string]string, body []byte) (*http.Response, error) {
+	path, rawURL, err := c.buildURL(pathTemplate, params)
+	if err != nil {
+		return nil, err
 	}
 
 	var bodyReader io.Reader
@@ -142,30 +164,10 @@ func (c *Client) DoWithContext(ctx context.Context, method, pathTemplate string,
 	return resp, nil
 }
 
-func (c *Client) DryRun(method, pathTemplate string, params map[string]string, body []byte) string {
-	remaining := make(map[string]string)
-	for k, v := range params {
-		remaining[k] = v
-	}
-
-	path := pathTemplate
-	path = strings.ReplaceAll(path, "{plan_id}", c.planID)
-
-	for k, v := range remaining {
-		placeholder := "{" + k + "}"
-		if strings.Contains(path, placeholder) {
-			path = strings.ReplaceAll(path, placeholder, v)
-			delete(remaining, k)
-		}
-	}
-
-	rawURL := c.baseURL + path
-	if len(remaining) > 0 {
-		q := url.Values{}
-		for k, v := range remaining {
-			q.Set(k, v)
-		}
-		rawURL += "?" + q.Encode()
+func (c *Client) DryRun(method, pathTemplate string, params map[string]string, body []byte) (string, error) {
+	_, rawURL, err := c.buildURL(pathTemplate, params)
+	if err != nil {
+		return "", err
 	}
 
 	result := fmt.Sprintf("%s %s", method, rawURL)
@@ -176,5 +178,5 @@ func (c *Client) DryRun(method, pathTemplate string, params map[string]string, b
 		}
 		result += fmt.Sprintf(" body: %s", preview)
 	}
-	return result
+	return result, nil
 }

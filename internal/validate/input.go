@@ -16,11 +16,14 @@ func vErr(format string, args ...any) error {
 
 // PathParam validates that a user-supplied value is safe to embed in a URL path.
 func PathParam(name, value string) error {
-	if value == "" {
+	if strings.TrimSpace(value) == "" {
 		return vErr("field %q: must not be empty", name)
 	}
 	if strings.Contains(value, "..") {
 		return vErr("field %q: contains path traversal characters", name)
+	}
+	if strings.Contains(value, "/") {
+		return vErr("field %q: contains path separator", name)
 	}
 	if strings.ContainsAny(value, "?#&") {
 		return vErr("field %q: contains query injection characters", name)

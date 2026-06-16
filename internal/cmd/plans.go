@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/glebmish/ynab-cli/internal/validate"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +61,3 @@ func newPlansGetSettingsCmd() *cobra.Command {
 		},
 	}
 }
-
-// ensure validate is referenced (helpers later will use it).
-var _ = validate.PathParam

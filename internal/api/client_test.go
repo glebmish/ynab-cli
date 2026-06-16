@@ -133,8 +133,29 @@ func TestAPIError429Hint(t *testing.T) {
 
 func TestDryRun(t *testing.T) {
 	client := NewClient("https://api.ynab.com/v1", "tok", "last-used")
-	out := client.DryRun("GET", "/plans/{plan_id}/transactions", map[string]string{"since_date": "2025-01-01"}, nil)
+	out, err := client.DryRun("GET", "/plans/{plan_id}/transactions", map[string]string{"since_date": "2025-01-01"}, nil)
+	if err != nil {
+		t.Fatalf("DryRun returned error: %v", err)
+	}
 	if !strings.Contains(out, "GET") || !strings.Contains(out, "last-used") || !strings.Contains(out, "since_date=2025-01-01") {
 		t.Errorf("DryRun output unexpected: %q", out)
+	}
+}
+
+func TestDryRunRejectsPathInjection(t *testing.T) {
+	client := NewClient("https://api.ynab.com/v1", "tok", "last-used")
+	// account_id matches the {account_id} placeholder and must be path-validated.
+	_, err := client.DryRun("GET", "/plans/{plan_id}/accounts/{account_id}",
+		map[string]string{"account_id": "../../user"}, nil)
+	if err == nil {
+		t.Fatal("expected path-injection in account_id to be rejected, got nil error")
+	}
+}
+
+func TestDoRejectsPlanIDInjection(t *testing.T) {
+	client := NewClient("https://api.ynab.com/v1", "tok", "../accounts")
+	_, err := client.Do("GET", "/plans/{plan_id}/accounts", nil, nil)
+	if err == nil {
+		t.Fatal("expected path-injection in plan_id to be rejected, got nil error")
 	}
 }

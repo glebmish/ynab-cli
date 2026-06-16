@@ -22,6 +22,25 @@ func TestPathParamRejectsTraversal(t *testing.T) {
 	}
 }
 
+func TestPathParamRejectsSlash(t *testing.T) {
+	// A bare slash would silently retarget the endpoint without tripping the
+	// ".." traversal check, so it must be rejected on its own.
+	cases := []string{"foo/transactions", "a/b", "/leading"}
+	for _, c := range cases {
+		if err := PathParam("id", c); err == nil {
+			t.Errorf("PathParam(%q) expected error for path separator, got nil", c)
+		}
+	}
+}
+
+func TestPathParamRejectsWhitespaceOnly(t *testing.T) {
+	for _, c := range []string{" ", "\t", "  "} {
+		if err := PathParam("id", c); err == nil {
+			t.Errorf("PathParam(%q) expected error for whitespace-only, got nil", c)
+		}
+	}
+}
+
 func TestPathParamRejectsControlChars(t *testing.T) {
 	cases := []string{"ab\x00cd", "foo\nbar", "foo\rbar"}
 	for _, c := range cases {

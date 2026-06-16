@@ -90,7 +90,11 @@ func doGet(cmd *cobra.Command, path string, params map[string]string) error {
 	c := api.FromContext(cmd.Context())
 
 	if dr, _ := cmd.Flags().GetBool("dry-run"); dr {
-		fmt.Println(c.DryRun("GET", path, merged, nil))
+		out, err := c.DryRun("GET", path, merged, nil)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
 		return nil
 	}
 
@@ -122,7 +126,11 @@ func doMutate(cmd *cobra.Command, method, path string, params map[string]string,
 	}
 
 	if dr, _ := cmd.Flags().GetBool("dry-run"); dr {
-		fmt.Println(c.DryRun(method, path, merged, body))
+		out, err := c.DryRun(method, path, merged, body)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
 		return nil
 	}
 
@@ -156,7 +164,11 @@ func doDelete(cmd *cobra.Command, path string, params map[string]string, resourc
 	c := api.FromContext(cmd.Context())
 
 	if dryRun {
-		fmt.Println(c.DryRun("DELETE", path, merged, nil))
+		out, err := c.DryRun("DELETE", path, merged, nil)
+		if err != nil {
+			return err
+		}
+		fmt.Println(out)
 		return nil
 	}
 

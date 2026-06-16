@@ -118,3 +118,27 @@ func TestValidateOK(t *testing.T) {
 		t.Errorf("Validate() = %v, want nil", err)
 	}
 }
+
+func TestValidateRejectsInsecureBaseURL(t *testing.T) {
+	cases := []string{
+		"http://api.ynab.com/v1", // plaintext to a real host: token would leak
+		"http://evil.example/v1",
+		"ftp://api.ynab.com/v1",
+		"not-a-url",
+	}
+	for _, raw := range cases {
+		cfg := &Config{AccessToken: "tok", PlanID: "last-used", BaseURL: raw}
+		if err := cfg.Validate(); err == nil {
+			t.Errorf("Validate() with base_url %q = nil, want error", raw)
+		}
+	}
+}
+
+func TestValidateAllowsLocalhostHTTP(t *testing.T) {
+	for _, raw := range []string{"http://localhost:8080/v1", "http://127.0.0.1:9999/v1"} {
+		cfg := &Config{AccessToken: "tok", PlanID: "last-used", BaseURL: raw}
+		if err := cfg.Validate(); err != nil {
+			t.Errorf("Validate() with base_url %q = %v, want nil (localhost http allowed)", raw, err)
+		}
+	}
+}

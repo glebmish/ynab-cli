@@ -15,10 +15,6 @@ type Options struct {
 	FlattenSplits bool
 }
 
-func FormatFromFlag(formatFlag, fieldsFlag string) Options {
-	return FormatFromFlags(formatFlag, fieldsFlag, false)
-}
-
 func FormatFromFlags(formatFlag, fieldsFlag string, flattenSplits bool) Options {
 	opts := Options{Format: formatFlag, FlattenSplits: flattenSplits}
 	if fieldsFlag != "" {
@@ -161,11 +157,6 @@ func needsControlStrip(s string) bool {
 
 func WriteRaw(w io.Writer, data []byte) error {
 	_, err := w.Write(data)
-	return err
-}
-
-func DryRunOutput(w io.Writer, dryRunText string) error {
-	_, err := fmt.Fprintln(w, dryRunText)
 	return err
 }
 

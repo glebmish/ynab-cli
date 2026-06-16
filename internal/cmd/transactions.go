@@ -44,6 +44,9 @@ func applyTransactionListFlags(cmd *cobra.Command, params map[string]string) err
 		params["since_date"] = v
 	}
 	if v, _ := cmd.Flags().GetString("type"); v != "" {
+		if v != "uncategorized" && v != "unapproved" {
+			return validationErr(fmt.Errorf("--type must be 'uncategorized' or 'unapproved', got %q", v))
+		}
 		params["type"] = v
 	}
 	if v, _ := cmd.Flags().GetInt64("last-knowledge-of-server"); v > 0 {
